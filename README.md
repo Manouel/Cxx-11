@@ -13,7 +13,7 @@ bool pair_int(int i)
   return (i%2 == 0);
 }
 
-bool pair_int(int \*i)
+bool pair_int(int *i)
 {
   if (!i)
   {
@@ -21,7 +21,7 @@ bool pair_int(int \*i)
     return true;
   }
   else
-    return \*i % 2 == 0;
+    return *i % 2 == 0;
 }
 
 int main()
@@ -30,7 +30,7 @@ int main()
   cout << pair_int(i) << endl;
   
   int *pi = new int;
-  \*pi = 3;
+  *pi = 3;
   
   cout << pair_int(*pi) << endl;
   cout << pair_int(NULL) << endl;
@@ -57,19 +57,19 @@ Ce nouveau type et cette nouvelle valeur permettent donc d'éviter les ambiguït
 Le mot-clé auto, lorsqu'il est utilisé à la place d'un type de variable, permet au compilateur de déduire ce type à la compilation. Celui-ci sera donc principalement utilisé lors de la création de variables. Pour cela il faut initialiser la variable lors de sa création. C'est à l'aide de la valeur qu'elle reçoit que le compilateur va pouvoir en déduire son type.
 
 ```cpp
-  /\* int */
+  /* int */
   auto i = 5;
   
-  /\* int si x de type int, sinon erreur \*/
-  const auto \*v = &x, u = 6;
+  /* int si x de type int, sinon erreur \*/
+  const auto *v = &x, u = 6;
 
-  /\* float */
+  /* float */
   static auto y = 0.0;
   
-  /\* int */
+  /* int */
   auto ii = 3;
   
-  /\* int */
+  /* int */
   auto g() -> decltype(ii) { return 0; }
   auto h() -> decltype(ii);
 ```
@@ -147,6 +147,11 @@ Comme vu précédemment, decltype va également pouvoir permettre de renseigner 
 Ou bien comme dans l'exemple présenté, cela peut etre utile afin que le constructeur vide appelle un autre constructeur avec des valeurs par défaut.
 
 3/- Il est également possible d'initialiser un objet par une liste d'initialisation, comme avec les tableaux. Ceci va donc permettre d'initialiser les objets de la classe vector par exemple, en le remplissant directement.
+
+```cpp
+std::vector<std::string> vect{"alpha", "beta", "gamma"};
+std::map<int, std::string> map {{1, "1"}, {2, "2"}};
+```
 
 ---
 
