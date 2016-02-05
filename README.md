@@ -16,8 +16,8 @@
 - [Final](#final)
 - [Ordre d'appel des constructeurs et destructeurs](#linearization)
 - [Boucle for sur un intervalle](#for)
+- [Énumérations fortement typées](#enums)
 - Pointeurs intelligents
-- Énumérations fortement typées
 
 ---
 
@@ -326,4 +326,21 @@ int elements[] = {0, 1, 2, 3, 4, 5};
 for (int e : elements)
     std::cout << e << ' ';
 std::cout << '\n';
+```
+
+---
+
+#### Énumérations fortement typées <a id="enums"></a>
+
+Il existe maintenant des énumérations fortement typées, identifiées par `enum class`. Contrairement aux énumérations classiques dont les valeurs étaient implicitement converties en entier (lors d'un affichage par exemple), les énumérations fortement typées nécessitent un cast explicite, et évitent donc les opérations qui n'ont pas de sens.
+Contrairement aux énumérations classiques, l'accès aux valeurs se fait par le nom de l'énumération suivi par l'opérateur de portée `::`.
+
+```cpp
+enum class Direction { Haut, Droite, Bas, Gauche };
+
+Direction dir = Direction::Haut;
+std::cout << dir << std::endl;  // Ne compile plus car pas de cast explcite ! (alors que c'est le cas avec les enum)
+std::cout << static_cast<int>(dir) << std::endl;
+
+Direction dir2 = dir + 1;       // N'a pas de sens, ne compile plus.
 ```
