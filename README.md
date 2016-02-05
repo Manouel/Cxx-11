@@ -16,6 +16,8 @@
 - [Final](#final)
 - [Ordre d'appel des constructeurs et destructeurs](#linearization)
 - Pointeurs intelligents
+- Énumérations fortement typées
+- Boucle for sur un intervalle
 
 ---
 
@@ -70,7 +72,7 @@ Ce nouveau type et cette nouvelle valeur permettent donc d'éviter les ambiguït
 
 #### auto <a id="auto"></a>
 
-Le mot-clé auto, lorsqu'il est utilisé à la place d'un type de variable, permet au compilateur de déduire ce type à la compilation. Celui-ci sera donc principalement utilisé lors de la création de variables. Pour cela il faut initialiser la variable lors de sa création. C'est à l'aide de la valeur qu'elle reçoit que le compilateur va pouvoir en déduire son type.
+Le mot-clé `auto`, lorsqu'il est utilisé à la place d'un type de variable, permet au compilateur de déduire ce type à la compilation. Celui-ci sera donc principalement utilisé lors de la création de variables. Pour cela il faut initialiser la variable lors de sa création. C'est à l'aide de la valeur qu'elle reçoit que le compilateur va pouvoir en déduire son type.
 
 ```cpp
   /* int */
@@ -90,18 +92,18 @@ Le mot-clé auto, lorsqu'il est utilisé à la place d'un type de variable, perm
   auto h() -> decltype(ii);
 ```
 
-Dans l'exemple, la variable i sera de type entier, puisqu'elle reçoit un littéral entier valant 5.
+Dans l'exemple, la variable `i` sera de type entier, puisqu'elle reçoit un littéral entier valant 5.
 
-Concernant la 2e ligne, celle-ci compilera uniquement si la variable x est de type int. En effet, de même que lorsque l'on indique un type normal, l'ensemble des variables déclarées sur une même ligne doivent être de même type.
-Etant donné que la variable u reçoit, un littéral entier 6, le compilateur ne pourra déduire le type représenté par auto uniquement si le pointeur v est de même type, c'est à dire si x est un entier.
-A noter que le mot-clé auto peut être utilisé avec d'autres mots-clé comme const.
+Concernant la 2e ligne, celle-ci compilera uniquement si la variable `x` est de type `int`. En effet, de même que lorsque l'on indique un type normal, l'ensemble des variables déclarées sur une même ligne doivent être de même type.
+Etant donné que la variable `u` reçoit, un littéral entier 6, le compilateur ne pourra déduire le type représenté par `auto` uniquement si le pointeur `v` est de même type, c'est à dire si `x` est un entier.
+A noter que le mot-clé `auto` peut être utilisé avec d'autres mots-clé comme `const`.
 
-La variable y sera de type double, car elle est initialisée avec un littéral flottant.
+La variable `y` sera de type double, car elle est initialisée avec un littéral flottant.
 
-Il est également possible d'utiliser le mot-clé auto pour indiquer le type de retour d'une fonction. Pour cela, il faut utiliser la notation decltype, en plus du mot-clé auto, afin d'indiquer au compilateur quel type il doit déduire de auto.
+Il est également possible d'utiliser le mot-clé `auto` pour indiquer le type de retour d'une fonction. Pour cela, il faut utiliser la notation `decltype`, en plus du mot-clé `auto`, afin d'indiquer au compilateur quel type il doit déduire de `auto`.
 
-Dans l'exemple précédent, le type de retour de la fonction g sera le type de la variable ii, comme le decltype l'indique. Ici par exemple, g retournera un entier.
-Cette notation fonctionne aussi pour les déclarations de fonction. De même h retournera un entier. Il faut bien sur que cette signature corresponde lors de la définition de la fonction h.
+Dans l'exemple précédent, le type de retour de la fonction `g` sera le type de la variable `ii`, comme le `decltype` l'indique. Ici par exemple, `g` retournera un entier.
+Cette notation fonctionne aussi pour les déclarations de fonction. De même `h` retournera un entier. Il faut bien sur que cette signature corresponde lors de la définition de la fonction `h`.
 
 ```cpp
   auto h() -> decltype(1)   		int h() { return 1; }
@@ -117,20 +119,20 @@ Cette notation fonctionne aussi pour les déclarations de fonction. De même h r
   auto a = 5, b = "cinq";
 ```
 
-Pour la déclaration de la variable j, il faut retirer le type auto ou bien int. En effet, le compilateur va remplacer le mot auto par déduction du type. Il ne faut donc pas indiquer un type supplémentaire.
+Pour la déclaration de la variable `j`, il faut retirer le type `auto` ou bien `int`. En effet, le compilateur va remplacer le mot `auto` par déduction du type. Il ne faut donc pas indiquer un type supplémentaire.
 
-Concernant la première ligne avec la fonction h, il faut rajouter un decltype sur la signature qui comprend le mot auto. Sinon le compilateur ne peut savoir de quel type il s'agit. Comme la fonction retourne 1, on met une expression entière dans le decltype.
-Pour la 2e ligne, il faut ajouter le decltype à la déclaration et à la définition pusique chacune d'elle comprend le mot-clé auto.
-De manière générale, la notation decltype doit être utilisée à chaque fois que auto est indiqué (signature ou définition de fonction).
+Concernant la première ligne avec la fonction `h`, il faut rajouter un `decltype` sur la signature qui comprend le mot `auto`. Sinon le compilateur ne peut savoir de quel type il s'agit. Comme la fonction retourne 1, on met une expression entière dans le `decltype`.
+Pour la 2e ligne, il faut ajouter le `decltype` à la déclaration et à la définition pusique chacune d'elle comprend le mot-clé `auto`.
+De manière générale, la notation `decltype` doit être utilisée à chaque fois que `auto` est indiqué (signature ou définition de fonction).
 
-Pour la fonction f, auto devra correspondre à un string puisque f retourne une chaine de caractères dans le if. Il faut donc déclarer une varialble de type string et ajouter un decltype pour indiquer au compilateur que le type de retour sera string. De plus il faut ajouter une valeur de retour au else.
+Pour la fonction `f`, auto devra correspondre à un string puisque `f` retourne une chaine de caractères dans le `if`. Il faut donc déclarer une varialble de type `string` et ajouter un `decltype` pour indiquer au compilateur que le type de retour sera `string`. De plus il faut ajouter une valeur de retour au `else`.
 
-Pour les variables k et l, il n'y aura pasde soucis de compilation. K sera de type int, car affecté avec la valeur 2. Lorsqu'on lui affecte un nombre flotant, la valeur sera castée en int, et donc tronquée, k vaudra 1.
-l sera un double, car initialisé avec 4.2. Lors de l'affectation, 3 sera casté en double, l vaudra 3.0.
+Pour les variables `k` et `l`, il n'y aura pasde soucis de compilation. `k` sera de type `int`, car affecté avec la valeur 2. Lorsqu'on lui affecte un nombre flotant, la valeur sera castée en `int`, et donc tronquée, `k` vaudra 1.
+`l` sera un `double`, car initialisé avec 4.2. Lors de l'affectation, 3 sera casté en double, `l` vaudra 3.0.
 
-La ligne suivante compile également, auto sera changé en int. La variable y sera un pointeur sur int, et reçoit l'adresse de x, également de type int.
+La ligne suivante compile également, `auto` sera changé en `int`. La variable `y` sera un pointeur sur `int`, et reçoit l'adresse de `x`, également de type `int`.
 
-La dernière ligne ne compile pas, a reçoit un littéral entier, et b une chaine de caractères.
+La dernière ligne ne compile pas, `a` reçoit un littéral entier, et `b` une chaine de caractères.
 Il faut déclarer ces variables sur 2 lignes distinctes.
 
 ---
@@ -165,7 +167,7 @@ Ou bien comme dans l'exemple présenté, cela peut etre utile afin que le constr
 3/- Il est également possible d'initialiser un objet par une liste d'initialisation, comme avec les tableaux. Ceci va donc permettre d'initialiser les objets de la classe vector par exemple, en le remplissant directement.
 
 ```cpp
-std::vector<std::string> vect{"alpha", "beta", "gamma"};
+std::vector<std::string> vect {"alpha", "beta", "gamma"};
 std::map<int, std::string> map {{1, "1"}, {2, "2"}};
 ```
 
