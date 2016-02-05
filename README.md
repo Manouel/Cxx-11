@@ -187,6 +187,7 @@ Ou bien comme dans l'exemple présenté, cela peut etre utile afin que le constr
 ```cpp
 class A
 {
+private:
     int nb;
 
 public:
@@ -206,7 +207,7 @@ std::map<int, std::string> m {{1, "1"}, {2, "2"}};
 double *doubles = new double[3] {0.5, 1.2, 12.99};
 
 Paire p1 {};        // Constructeur vide (= Paire p1;)
-Paire p {12, 20};   // Appel du constructeur Paire(int, int)
+Paire p2 {12, 20};   // Appel du constructeur Paire(int, int)
 ```
 
 ---
