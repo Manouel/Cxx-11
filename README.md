@@ -5,6 +5,9 @@
 - [auto](#auto)
 - [decltype](#decltype)
 - [Initialisation et construction](#init)
+  - [Initialisation d'attributs](#attr_init)
+  - [Appel d'un constructeur depuis un autre](#constructor_call)
+  - [Listes d'initialisation](#initializer_list)
 - [Lamda expressions](#lambda)
 - [Nouvelles collections](#collections)
   - [Unordered associative](#unordered)
@@ -139,8 +142,8 @@ Il faut déclarer ces variables sur 2 lignes distinctes.
 
 #### decltype <a id="decltype"></a>
 
-Le mot-clé decltype permet de déterminer le type d'une expression.
-Il peut donc être utilisé pour créer une variable. Mais il eut également désigner le type de variable déclarée avec auto, comme dans l'exemple suivant.
+Le mot-clé `decltype` permet de déterminer le type d'une expression.
+Il peut donc être utilisé pour créer une variable. Mais il eut également désigner le type de variable déclarée avec `auto`, comme dans l'exemple suivant.
 
 ```cpp
   int i;
@@ -150,25 +153,60 @@ Il peut donc être utilisé pour créer une variable. Mais il eut également dé
   decltype(j) v2;
 ```
 
-Ici, on considère 2 variables i et j, de type int (j étant déclaré avec auto).
-Le decltype va donc permettre de créer des variables du même type qu'une varialble déclarée avec un type comme i, et avec auto comme j. v et v2 seront donc également de type int.
+Ici, on considère 2 variables `i` et `j`, de type `int` (`j` étant déclaré avec `auto`).
+Le `decltype` va donc permettre de créer des variables du même type qu'une varialble déclarée avec un type comme `i`, et avec `auto` comme `j`. `v` et `v2` seront donc également de type `int`.
 
-Comme vu précédemment, decltype va également pouvoir permettre de renseigner le type de retour d'une fonction déclaré comme auto.
+Comme vu précédemment, `decltype` va également pouvoir permettre de renseigner le type de retour d'une fonction déclaré comme `auto`.
 
 ---
 
 #### Initialisation et construction <a id="init"></a>
 
-1/- Parmi les nouveautés apportées, nous avons tout d'abord l'initialisation des attributs d'instance lors de leur déclaration dans la classe. Ceci permet donc d'initialiser les attributs avec une valeur par défaut. Dans le cas où les attributs ne sont pas initialisés dans le constructeur, ceux-ci disposeront quand même d'une valeur cohérente.
+##### Initialisation d'attributs <a id="attr_init"></a>
 
-2/- Un constructeur d'une classe peut désormais appeler un autre constructeur de la même classe. Ceci se réveille donc pratique lorsque plusieurs constructeurs effectuent des actions communes. Cela va permettre d'éviter la répétition d'instructions ou bien un appel à une fonction regroupant ces instructions par chaque constructeur.
+Parmi les nouveautés apportées, nous avons tout d'abord l'initialisation des attributs d'instance lors de leur déclaration dans la classe. Ceci permet donc d'initialiser les attributs avec une valeur par défaut. Dans le cas où les attributs ne sont pas initialisés dans le constructeur, ceux-ci disposeront quand même d'une valeur cohérente.
+
+```cpp
+class A
+{
+private:
+    int m_IntVal = 5;
+    std::string m_StringVal {"value"};
+
+public:
+    A() {}
+    A(int val) : m_IntVal(val) {}
+};
+```
+
+##### Appel d'un constructeur depuis un autre <a id="constructor_call"></a>
+
+Un constructeur d'une classe peut désormais appeler un autre constructeur de la même classe. Ceci se réveille donc pratique lorsque plusieurs constructeurs effectuent des actions communes. Cela va permettre d'éviter la répétition d'instructions ou bien un appel à une fonction regroupant ces instructions par chaque constructeur.
 Ou bien comme dans l'exemple présenté, cela peut etre utile afin que le constructeur vide appelle un autre constructeur avec des valeurs par défaut.
 
-3/- Il est également possible d'initialiser un objet par une liste d'initialisation, comme avec les tableaux. Ceci va donc permettre d'initialiser les objets de la classe vector par exemple, en le remplissant directement.
+```cpp
+class A
+{
+    int nb;
+
+public:
+    A(int n) : nb(n) {}
+    A() : A(42) {}
+};
+```
+
+##### Listes d'initialisation <a id="initializer_list"></a>
+
+Il est également possible d'initialiser un objet par une liste d'initialisation, comme avec les tableaux. Ceci va donc permettre d'initialiser les objets de la classe vector par exemple, en le remplissant directement, ou alors également des instances de classes en appelant le constructeur correspondant.
 
 ```cpp
 std::vector<std::string> vect {"alpha", "beta", "gamma"};
-std::map<int, std::string> map {{1, "1"}, {2, "2"}};
+std::vector<int> vect2 = {1, 2, 3};
+std::map<int, std::string> m {{1, "1"}, {2, "2"}};
+double *doubles = new double[3] {0.5, 1.2, 12.99};
+
+Paire p1 {};        // Constructeur vide (= Paire p1;)
+Paire p {12, 20};   // Appel du constructeur Paire(int, int)
 ```
 
 ---
@@ -201,7 +239,7 @@ std::tuple<std::string, int, bool> loutre("loulou", 10, true);
 
 ##### Array <a id="array"></a>
 
-Le type array définit dans la stl un conteneur représentant les tableaux statiques du langage. On peut alors définir ces tableaux de manière à ce qu'ils comportent toutes les propriétés des conteneurs de la stl.
+Le type `array` définit dans la STL un conteneur représentant les tableaux statiques du langage. On peut alors définir ces tableaux de manière à ce qu'ils comportent toutes les propriétés des conteneurs de la STL.
 
 ```cpp
 std::array<int, 4> tab = {1, 5, 8, 9};
@@ -218,7 +256,7 @@ std::cout << std::endl;
 
 #### Fonctions begin et end <a id="begin_end"></a>
 
-Il existe maintenant, en plus des méthodes begin et end des conteneurs retournant respectivement un itérateur sur le début et la fin du conteneur, des fonctions begin et end.
+Il existe maintenant, en plus des méthodes `begin` et `end` des conteneurs retournant respectivement un itérateur sur le début et la fin du conteneur, des fonctions `begin` et `end`.
 Il est donc possible de surcharger les fonctions afin de permettre de les utiliser avec n'importe quel type de conteneur, même ceux qui ne contiennent pas les méthodes,  ou même avec les tableaux.
 
 ```cpp
@@ -233,9 +271,9 @@ for (it = begin(v); it != end(v); it++)
 
 #### Héritage de constructeurs <a id="constructors"></a>
 
-On peut maintenant en C++11, hériter des constructeurs d'une super classe à l'aide du mot-clé using.
+On peut maintenant en C++11, hériter des constructeurs d'une super classe à l'aide du mot-clé `using`.
 
-Dans l'exemple présenté, les deux objets feront appel au constructeur de B. Dans la classe D, le mot using indique que la classe peut utiliser le constructeur de B pour les instances de D qui sont créées. Cela fonctionne avec les objets alloués automatiquement ou dynamiquement.
+Dans l'exemple présenté, les deux objets feront appel au constructeur de `B`. Dans la classe `D`, le mot using indique que la classe peut utiliser le constructeur de `B` pour les instances de `D` qui sont créées. Cela fonctionne avec les objets alloués automatiquement ou dynamiquement.
 
 En revanche, l'héritage de constructeurs ne peut être utilisé que si l'héritage entre les classes n'est pas virtuel.
 
