@@ -1,9 +1,25 @@
 # C++11
 ### Nouveautés et fonctionnalités
 
+- [nullptr](#nullptr)
+- [auto](#auto)
+- [decltype](#decltype)
+- [Initialisation et construction](#init)
+- [Lamda expressions](#lambda)
+- [Nouvelles collections](#collections)
+  - [Unordered associative](#unordered)
+  - [Tuple](#tuple)
+  - [Array](#array)
+- [Fonctions begin et end](#begin_end)
+- [Héritage de constructeurs](#constructors)
+- [Override](#override)
+- [Final](#final)
+- [Ordre d'appel des constructeurs et destructeurs](#linearization)
+- Pointeurs intelligents
+
 ---
 
-#### nullptr
+#### nullptr <a id="nullptr"></a>
 
 
 ```cpp
@@ -52,7 +68,7 @@ Ce nouveau type et cette nouvelle valeur permettent donc d'éviter les ambiguït
 
 ---
 
-#### auto
+#### auto <a id="auto"></a>
 
 Le mot-clé auto, lorsqu'il est utilisé à la place d'un type de variable, permet au compilateur de déduire ce type à la compilation. Celui-ci sera donc principalement utilisé lors de la création de variables. Pour cela il faut initialiser la variable lors de sa création. C'est à l'aide de la valeur qu'elle reçoit que le compilateur va pouvoir en déduire son type.
 
@@ -60,7 +76,7 @@ Le mot-clé auto, lorsqu'il est utilisé à la place d'un type de variable, perm
   /* int */
   auto i = 5;
   
-  /* int si x de type int, sinon erreur \*/
+  /* int si x de type int, sinon erreur */
   const auto *v = &x, u = 6;
 
   /* float */
@@ -97,7 +113,7 @@ Cette notation fonctionne aussi pour les déclarations de fonction. De même h r
   
   auto k = 2; k = 1.2;
   auto l = 4.2; l = 3;
-  auto x = 5, \*y = &x;
+  auto x = 5, *y = &x;
   auto a = 5, b = "cinq";
 ```
 
@@ -119,7 +135,7 @@ Il faut déclarer ces variables sur 2 lignes distinctes.
 
 ---
 
-#### decltype
+#### decltype <a id="decltype"></a>
 
 Le mot-clé decltype permet de déterminer le type d'une expression.
 Il peut donc être utilisé pour créer une variable. Mais il eut également désigner le type de variable déclarée avec auto, comme dans l'exemple suivant.
@@ -139,7 +155,7 @@ Comme vu précédemment, decltype va également pouvoir permettre de renseigner 
 
 ---
 
-#### Initialisation et construction
+#### Initialisation et construction <a id="init"></a>
 
 1/- Parmi les nouveautés apportées, nous avons tout d'abord l'initialisation des attributs d'instance lors de leur déclaration dans la classe. Ceci permet donc d'initialiser les attributs avec une valeur par défaut. Dans le cas où les attributs ne sont pas initialisés dans le constructeur, ceux-ci disposeront quand même d'une valeur cohérente.
 
@@ -155,7 +171,7 @@ std::map<int, std::string> map {{1, "1"}, {2, "2"}};
 
 ---
 
-#### Lamda expressions
+#### Lamda expressions <a id="lambda"></a>
 
 Une lambda expression permet de définir une fonction anonyme. Cela permet d'éviter d'avoir à déclarer une fonction dans une classe ou un fichier.
 Pour les fonctions comme for_each qui prennent en paramètre un pointeur sur une fonction, il est donc possible de définir celle-ci directement au moment de l'appel à for_each.
@@ -167,13 +183,13 @@ On y indique les  variables capturées, c'est à dire les variables définies en
 
 ---
 
-#### Nouvelles collections
+#### Nouvelles collections <a id="collections"></a>
 
-##### Unordered associative
+##### Unordered associative <a id="unordered"></a>
 
 Il existe maintenant les collections unordered pour les conteneurs associatifs fonctionnant sur un principe clé/valeur. Cela correspond donc aux classes  map, multimap, set et multiset. Ces nouvelles collections permettent de définir notre propose fonction de hachage utilisée pour stocker les éléments. Cela permet donc de définir notre propre stockage et notre propre complexité lors de l'utilisation du conteneur.
 
-##### Tuple
+##### Tuple <a id="tuple"></a>
 
 Ce nouveau conteneur permet de créer une collection de taille fixe avec des types différents. On peut l'utiliser comme le type pair à la différence que celui-ci ne se limite pas à 2 éléments. On peut donc créer un ensemble comportant une liste de types prédéfinis.
 
@@ -181,7 +197,7 @@ Ce nouveau conteneur permet de créer une collection de taille fixe avec des typ
 std::tuple<std::string, int, bool> loutre("loulou", 10, true);
 ```
 
-##### Array
+##### Array <a id="array"></a>
 
 Le type array définit dans la stl un conteneur représentant les tableaux statiques du langage. On peut alors définir ces tableaux de manière à ce qu'ils comportent toutes les propriétés des conteneurs de la stl.
 
@@ -198,7 +214,7 @@ std::cout << std::endl;
 
 ---
 
-#### Fonctions begin et end
+#### Fonctions begin et end <a id="begin_end"></a>
 
 Il existe maintenant, en plus des méthodes begin et end des conteneurs retournant respectivement un itérateur sur le début et la fin du conteneur, des fonctions begin et end.
 Il est donc possible de surcharger les fonctions afin de permettre de les utiliser avec n'importe quel type de conteneur, même ceux qui ne contiennent pas les méthodes,  ou même avec les tableaux.
@@ -213,7 +229,7 @@ for (it = begin(v); it != end(v); it++)
 
 ---
 
-#### Héritage de constructeurs
+#### Héritage de constructeurs <a id="constructors"></a>
 
 On peut maintenant en C++11, hériter des constructeurs d'une super classe à l'aide du mot-clé using.
 
@@ -231,7 +247,7 @@ class D : public B
 
 ---
 
-#### Override
+#### Override <a id="override"></a>
 
 Le mot-clé override permet d'imposer au compilateur qu'une fonction doit hériter d'une fonction virtuelle d'une classe mère.
 Cela permet donc, en cas d'erreur dans la signature, de générer une erreur de compilation indiquant que la méthode signalée override n'hérite d'aucune autre méthode.
@@ -243,7 +259,7 @@ Le programme 3 fonctionne en C++11, la méthode de B hérite bien de celle de la
 
 ---
 
-#### Final
+#### Final <a id="final"></a>
 
 Tout comme le mot-clé override utilisé pour indiquer qu'une méthode doit hériter d'une méthode de la classe parente, final permet d'indiquer qu'une classe ou une méthode n'est pas dérivable.
 
@@ -257,7 +273,7 @@ Dans le troisième programme, la méthode f de A est déclarée final et B défi
 
 ---
 
-#### Ordre d'appel des constructeurs et destructeurs
+#### Ordre d'appel des constructeurs et destructeurs <a id="linearization"></a>
 
 L'ordre d'appel des constructeurs et destructeurs ne change pas en C++11. L'affichage suivant présente cet ordre d'appel avec les classes CompteBancaire.
 
