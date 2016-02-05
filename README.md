@@ -15,9 +15,9 @@
 - [Override](#override)
 - [Final](#final)
 - [Ordre d'appel des constructeurs et destructeurs](#linearization)
+- [Boucle for sur un intervalle](#for)
 - Pointeurs intelligents
 - Énumérations fortement typées
-- Boucle for sur un intervalle
 
 ---
 
@@ -289,3 +289,41 @@ Destructeur CompteDepotRemunere
 Destructeur CompteDepot
 Destructeur CompteRemunere
 Destructeur CB
+
+---
+
+#### Boucle for sur un intervalle <a id="for"></a>
+
+Il est désormais possible d'utiliser la boucle for sur un intervalle à la manière de `for_each` qui existait sur les conteneurs.
+
+```cpp
+std::vector<int> elements = {0, 1, 2, 3, 4, 5};
+
+// Par valeur
+for (int e : elements)
+    std::cout << e << ' ';
+std::cout << '\n';
+
+for (auto e : elements)
+    std::cout << e << ' ';
+std::cout << '\n';
+
+// Par référence
+for (int& e : elements)
+    ++e;
+
+for (const int& e : elements)
+    std::cout << e << ' ';
+std::cout << '\n';
+
+// Sur une liste d'initialisation
+for (int e : {0, 1, 2, 3, 4, 5})
+    std::cout << e << ' ';
+std::cout << '\n';
+
+// Sur les tableaux
+int elements[] = {0, 1, 2, 3, 4, 5};
+for (int e : elements)
+    std::cout << e << ' ';
+std::cout << '\n';
+```
