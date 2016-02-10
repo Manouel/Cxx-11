@@ -290,27 +290,69 @@ class D : public B
 
 #### Override <a id="override"></a>
 
-Le mot-clé override permet d'imposer au compilateur qu'une fonction doit hériter d'une fonction virtuelle d'une classe mère.
-Cela permet donc, en cas d'erreur dans la signature, de générer une erreur de compilation indiquant que la méthode signalée override n'hérite d'aucune autre méthode.
-C'est le cas du programme 2, la méthode f de la classe B déclarée override et qui doit donc hériter d'une méthode et la redéfinir. Or dans la classe B, f prend en paramètre un int au lieu d'un double. Le programme ne compile pas.
+Le mot-clé `override` permet d'imposer au compilateur qu'une fonction doit hériter d'une fonction virtuelle d'une classe mère.
+Cela permet donc, en cas d'erreur dans la signature, de générer une erreur de compilation indiquant que la méthode signalée `override` n'hérite d'aucune autre méthode.
+C'est le cas dans l'exemple suivant, avec les méthodes `foo(int) const` et `foo(string)` de la classe `B` déclarées `override` et qui doivent donc hériter d'une méthode et la redéfinir. Or dans la classe `B`, la deuxième méthode `foo` est déclarée constante contrairement à celle de la classe mère, et la troisième prend en paramètre un `string` au lieu d'un `int`. Le programme ne compile donc pas.
+En revanche, la méthode `foo(int)` de la classe `B` redéfinit bien celle de la classe `A`.
+A noter que la méthode de la classe mère doit bien être déclarée `virtual`.
 
-Le programme 1 fonctionne en C++98, mais la méthode f de B n'hérite pas de celle de A pour les même raisons puisque la signature n'est pas la même.
+```cpp
+class A 
+{
+	public:
+	
+		virtual void foo(int i)
+		{
+			std::cout << "A::foo(int) " << i << std::endl;
+		}
+};
 
-Le programme 3 fonctionne en C++11, la méthode de B hérite bien de celle de la classe A car les signatures correspondent.
+class B : public A
+{
+	public:
+
+		virtual void foo(int i) override
+		{
+			std::cout << "B::foo(int) " << i << std::endl;
+		}
+		
+		virtual void foo(int) const;                // Ne compile pas
+		virtual void foo(std::string s) override;   // Ne compile pas
+};
+```
 
 ---
 
 #### Final <a id="final"></a>
 
-Tout comme le mot-clé override utilisé pour indiquer qu'une méthode doit hériter d'une méthode de la classe parente, final permet d'indiquer qu'une classe ou une méthode n'est pas dérivable.
+Tout comme le mot-clé `override` utilisé pour indiquer qu'une méthode doit hériter d'une méthode de la classe parente, le mot-clé `final` permet d'indiquer qu'une classe ou une méthode virtuelle n'est pas dérivable.
+Dans l'exemple, la classe `B` ne peut pas redéfinir la méthode `foo(int)` déclarée `final` dans la classe `A`. En revanche, la méthode `foo(string)` ne la redéfinissant pas, il n'y a pas d'erreur.
 
-Les 3 programmes présentés ne pourront pas fonctionner en C++98 car utilisent tous le terme final.
-Le premier ne fonctionnera pas en C++11 non plus car la classe A étant déclarée final, il n'est pas possible de créer de classe dérivant de celle-ci.
+De la même manière que pour les méthodes, il est possible d'annoter une classe comme `final`, afin qu'elle ne puisse pas être spécialisée. C'est le cas de la classe `B`, et c'est pourquoi la création de la classe `C` produit une erreur de compilation.
 
-Le deuxième programme comporte une erreur similaire puisque la classe A déclare une méthode f déclarée final et que la classe B hérite de cette méthode f comportant la même signature.
+```cpp
+class A 
+{
+	public:
+	
+		virtual void foo(int i) final;  
+        void bar() final;                   // Fonction non virtuelle, ne peut pas être final
+	
+};
 
+class B final : public A
+{
+	public:
 
-Dans le troisième programme, la méthode f de A est déclarée final et B définit une autre méthode f puisqu'elle ne comporte pas la même signature. Celle de la classe B n'est donc  pas considérée comme une méthode dérivant de celle de A. Et donc le final ne pose pas de problèmes car on fait la distinction entre les méthodes.
+		virtual void foo(int i);            // Pas possible
+		virtual void foo(std::string s);
+};
+
+class C : public B                          // Ne peut pas spécialiser B déclaré final
+{
+
+};
+```
 
 ---
 
