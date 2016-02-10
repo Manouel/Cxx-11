@@ -258,6 +258,7 @@ std::cout << std::endl;
 #### Fonctions begin et end <a id="begin_end"></a>
 
 Il existe maintenant, en plus des méthodes `begin` et `end` des conteneurs retournant respectivement un itérateur sur le début et la fin du conteneur, des fonctions `begin` et `end`.
+
 Il est donc possible de surcharger les fonctions afin de permettre de les utiliser avec n'importe quel type de conteneur, même ceux qui ne contiennent pas les méthodes,  ou même avec les tableaux.
 
 ```cpp
@@ -292,7 +293,9 @@ class D : public B
 
 Le mot-clé `override` permet d'imposer au compilateur qu'une fonction doit hériter d'une fonction virtuelle d'une classe mère.
 Cela permet donc, en cas d'erreur dans la signature, de générer une erreur de compilation indiquant que la méthode signalée `override` n'hérite d'aucune autre méthode.
+
 C'est le cas dans l'exemple suivant, avec les méthodes `foo(int) const` et `foo(string)` de la classe `B` déclarées `override` et qui doivent donc hériter d'une méthode et la redéfinir. Or dans la classe `B`, la deuxième méthode `foo` est déclarée constante contrairement à celle de la classe mère, et la troisième prend en paramètre un `string` au lieu d'un `int`. Le programme ne compile donc pas.
+
 En revanche, la méthode `foo(int)` de la classe `B` redéfinit bien celle de la classe `A`.
 A noter que la méthode de la classe mère doit bien être déclarée `virtual`.
 
@@ -316,7 +319,7 @@ class B : public A
 			std::cout << "B::foo(int) " << i << std::endl;
 		}
 		
-		virtual void foo(int) const;                // Ne compile pas
+		virtual void foo(int) const override;	    // Ne compile pas
 		virtual void foo(std::string s) override;   // Ne compile pas
 };
 ```
@@ -363,12 +366,19 @@ L'ordre d'appel des constructeurs et destructeurs ne change pas en C++11. L'affi
 
 Résultat :
 Constructeur CB
+
 Constructeur CompteRemunere
+
 Constructeur CompteDepot
+
 Constructeur CompteDepotRemunere
+
 Destructeur CompteDepotRemunere
+
 Destructeur CompteDepot
+
 Destructeur CompteRemunere
+
 Destructeur CB
 
 ---
