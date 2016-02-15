@@ -207,8 +207,22 @@ std::vector<int> vect2 = {1, 2, 3};
 std::map<int, std::string> m {{1, "1"}, {2, "2"}};
 double *doubles = new double[3] {0.5, 1.2, 12.99};
 
-Paire p1 {};        // Constructeur vide (= Paire p1;)
+Paire p1 {};         // Constructeur vide (= Paire p1;)
 Paire p2 {12, 20};   // Appel du constructeur Paire(int, int)
+```
+
+Il existe un nouveau type représentant ces listes : `std::initializer_list` définie dans le header `<initializer_list>`. Cela permet par exemple de prendre une liste d'initialisation en paramètre de fonction. Il est possible d'itérer sur ces listes de la même manière que les conteneurs.
+
+```cpp
+#include <initializer_list>
+
+void processList(std::initializer_list<int> list)
+{
+    for(std::initializer_list<int>::iterator it(list.begin()) ; it != list.end() ; ++it)
+    {
+        // ...
+    }
+}
 ```
 
 ---
@@ -362,7 +376,7 @@ class C : public B                          // Ne peut pas spécialiser B décla
 
 #### Bug de chevrons <a id="chevrons_fix"></a>
 
-Lors de la création de conteneurs de conteneurs, comme dans l'exemple qui suit, il fallait espacer les chevrons fermants afin que le compilateur ne les interprète pas comme un opérateur de flux `>>`. Il n'est maintenant plus nécessaire de mettre l'espace, et le compilateur fait maintenant la différence avec l'opérateur.
+Lors de la création de conteneurs de conteneurs, comme dans l'exemple qui suit, il fallait espacer les chevrons fermants afin que le compilateur ne les interprète pas comme un opérateur de flux `>>`. Il n'est maintenant plus nécessaire de mettre l'espace, et le compilateur fait la différence avec l'opérateur.
 
 ```cpp
 std::map<int, std::vector<int> >  // Avant
