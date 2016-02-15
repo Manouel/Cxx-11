@@ -92,6 +92,7 @@ Le mot-clé `auto`, lorsqu'il est utilisé à la place d'un type de variable, pe
   auto ii = 3;
   
   /* int */
+  auto f() -> int;
   auto g() -> decltype(ii) { return 0; }
   auto h() -> decltype(ii);
 ```
@@ -104,9 +105,10 @@ A noter que le mot-clé `auto` peut être utilisé avec d'autres mots-clé comme
 
 La variable `y` sera de type double, car elle est initialisée avec un littéral flottant.
 
-Il est également possible d'utiliser le mot-clé `auto` pour indiquer le type de retour d'une fonction. Pour cela, il faut utiliser la notation `decltype`, en plus du mot-clé `auto`, afin d'indiquer au compilateur quel type il doit déduire de `auto`.
+Il est également possible d'utiliser le mot-clé `auto` pour indiquer le type de retour d'une fonction. Pour cela, il faut préciser le type de retour avec la syntaxe `-> type` en indiquant directement le type, ou en utilisant la notation `decltype`, afin d'indiquer au compilateur quel type il doit déduire de `auto`.
 
-Dans l'exemple précédent, le type de retour de la fonction `g` sera le type de la variable `ii`, comme le `decltype` l'indique. Ici par exemple, `g` retournera un entier.
+Dans l'exemple précédent, le type de retour de la fonction `f` sera de type `int`.
+Pour la fonction `g`, il sera du type de la variable `ii`, comme le `decltype` l'indique. Ici par exemple, `g` retournera un entier.
 Cette notation fonctionne aussi pour les déclarations de fonction. De même `h` retournera un entier. Il faut bien sur que cette signature corresponde lors de la définition de la fonction `h`.
 
 ```cpp
@@ -218,10 +220,17 @@ Il existe un nouveau type représentant ces listes : `std::initializer_list` dé
 
 void processList(std::initializer_list<int> list)
 {
-    for(std::initializer_list<int>::iterator it(list.begin()) ; it != list.end() ; ++it)
+    for (std::initializer_list<int>::iterator it(list.begin()) ; it != list.end() ; ++it)
     {
         // ...
     }
+}
+
+int main()
+{
+    processList({1, 2, 3});
+    
+    return 0;
 }
 ```
 
