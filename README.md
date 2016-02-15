@@ -17,6 +17,7 @@
 - [Héritage de constructeurs](#constructors)
 - [Override](#override)
 - [Final](#final)
+- [Bug de chevrons](#chevrons_fix)
 - [Ordre d'appel des constructeurs et destructeurs](#linearization)
 - [Boucle for sur un intervalle](#for)
 - [Énumérations fortement typées](#enums)
@@ -357,6 +358,17 @@ class C : public B                          // Ne peut pas spécialiser B décla
 };
 ```
 
+---
+
+#### Bug de chevrons <a id="chevrons_fix"></a>
+
+Lors de la création de conteneurs de conteneurs, comme dans l'exemple qui suit, il fallait espacer les chevrons fermants afin que le compilateur ne les interprète pas comme un opérateur de flux `>>`. Il n'est maintenant plus nécessaire de mettre l'espace, et le compilateur fait maintenant la différence avec l'opérateur.
+
+```cpp
+std::map<int, std::vector<int> >  // Avant
+std::map<int, std::vector<int>>	  // C++11
+```
+ 
 ---
 
 #### Ordre d'appel des constructeurs et destructeurs <a id="linearization"></a>
