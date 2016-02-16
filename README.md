@@ -21,7 +21,8 @@
 - [Ordre d'appel des constructeurs et destructeurs](#linearization)
 - [Boucle for sur un intervalle](#for)
 - [Énumérations fortement typées](#enums)
-- Pointeurs intelligents
+- [Pointeurs intelligents](#smart_pointers)
+  - [shared_ptr](#shared_ptr)
 
 ---
 
@@ -469,4 +470,113 @@ std::cout << dir << std::endl;  // Ne compile plus car pas de cast explcite ! (a
 std::cout << static_cast<int>(dir) << std::endl;
 
 Direction dir2 = dir + 1;       // N'a pas de sens, ne compile plus.
+```
+
+---
+
+#### Pointeurs intelligents <a id="smart_pointers"></a>
+
+Les pointeurs intelligents ont pour but de pallier les problèmes des pointeurs classiques (pointeurs nus), qui doivent être systématiquement désalloués manuellement d'une part, et qui dans certains cas peuvent même entrainer les problèmes suivants.
+
+```cpp
+// Cas 1 (fuite mémoire)
+
+int foo()
+{
+    int *i = new int(42);
+    bar();			// Si bar lève une exception, delete non appelé.
+    delete i;
+}
+
+// Cas 2 (fuite mémoire)
+
+class A
+{
+private:
+    int *i;
+    int *j;
+
+public:
+    /* Si le new int(42) échoue par manque de mémoire, une exception est levée. 
+       L'objet A n'est alors pas considéré comme construit, et son destructeur ne sera pas appelé.
+       La mémoire allouée pour i ne sera donc pas libérée. */
+    A() : i(new int(314)), j(new int(42)) {}
+    ~A()
+    {
+        delete j;
+        delete i;
+    }
+};
+
+// Cas 3 (déréférencement de pointeur invalide)
+
+int *i = new int(42);
+int *j = i;
+delete i;
+*j = 2;  	// Erreur
+
+```
+
+Les problèmes sont généralement des fuites mémoires comme présentés ci-dessus, des désallocations sur des zones mémoires déjà libérées/non allouées, ou alors des accès mémoire sur des zones libérées par d'autres pointeurs (cas 3).
+De plus, les fonctions retourant des pointeurs sur des objets ne sont pas explicites, et il est difficile de savoir si c'est à l'utilisateur de libérer l'objet ou non.
+
+```cpp
+MyStruct* getStruct();
+```
+
+Les pointeurs intelligents présentent une solution à ces problèmes. Ils encapsulent des pointeurs, et gèrent la durée de vie des objets pointés.
+
+##### shared_ptr <a id="shared_ptr"></a>
+
+Le premier type de pointeur intelligent est `shared_ptr`, qui permet à plusieurs pointeurs d'accéder à la donnée partagée. Il y a un compteur de référence sur l'objet pointé, incrémenté lorsqu'un nouveau pointeur pointe sur l'objet, et décrémenté lorsqu'un pointeur arrête de pointer sur l'objet (pointeur détruit ou pointant vers un autre objet). Lorsque ce compteur atteint 0, la mémoire de l'objet pointé est libérée.
+
+```cpp
+std::shared_ptr<int> ptr1(new int (42));
+std::shared_ptr<int> ptr2 = std::make_shared<int>(42);	// A utiliser
+```
+
+Pour créer un `shared_ptr`, il suffit donc de lui passer un pointeur nu en paramètre. Cependant, il existe également une fonction `make_shared<>`, dont il faut privilégier l'utilisation car plus sûre et plus performante, et qui permet d'éviter toute présence de pointeur nu dans le code.
+
+```cpp
+std::shared_ptr<int> a = std::make_shared<int>(3);
+std::cout << a.use_count() << std::endl;				            // 1
+std::shared_ptr<int> b = a;
+std::cout << a.use_count() << " & " << b.use_count() << std::endl;	// 2 & 2
+
+{
+    std::shared_ptr<int> c;
+    std::shared_ptr<int> d = std::make_shared<int>(314);
+	std::cout << a.use_count() << std::endl;                        // 2
+	c = a;
+	std::cout << a.use_count() << std::endl;                        // 3
+	d = c;                                                          // Objet 314 libéré (compteur 0)
+	std::cout << a.use_count() << std::endl;                        // 4
+}
+
+// Les pointeurs c et d ont été détruits (portée locale au bloc)
+
+std::cout << a.use_count() << std::endl;                            // 2
+b.reset();
+std::cout << a.use_count() << std::endl;                            // 1
+
+// Destruction de a, libération de l'objet pointé
+```
+
+Il existe une méthode `use_count` qui permet d'afficher le nombre de référence sur l'objet pointé par le `shared_ptr`, principalement utilisé pour du débogage. La méthode `reset` permet au pointeur de ne plus pointer sur rien (construction par défaut).
+
+Ici, c'est donc les destructeurs des pointeurs appelés automatiquement qui vont permettrent la suppression des références, et donc la libération automatique de l'objet.
+
+Il existe également des conversions entre `shared_ptr`.
+
+```cpp
+class A {/*...*/};
+class B : public A {/*...*/};
+
+B* b1(new B);
+A* a(b1);
+B *b2 = dynamic_cast<B*>(a);
+
+std::shared_ptr<B> sb1(new B);
+std::shared_ptr<A> sa(sb1);
+std::shared_ptr<B> sb2 = std::dynamic_pointer_cast<B>(sa);
 ```
