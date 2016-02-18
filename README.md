@@ -185,7 +185,7 @@ public:
 
 ##### Appel d'un constructeur depuis un autre <a id="constructor_call"></a>
 
-Un constructeur d'une classe peut désormais appeler un autre constructeur de la même classe. Ceci se réveille donc pratique lorsque plusieurs constructeurs effectuent des actions communes. Cela va permettre d'éviter la répétition d'instructions ou bien un appel à une fonction regroupant ces instructions par chaque constructeur.
+Un constructeur d'une classe peut désormais appeler un autre constructeur de la même classe. Ceci se révèle donc pratique lorsque plusieurs constructeurs effectuent des actions communes. Cela va permettre d'éviter la répétition d'instructions ou bien un appel à une fonction regroupant ces instructions par chaque constructeur.
 Ou bien comme dans l'exemple présenté, cela peut etre utile afin que le constructeur vide appelle un autre constructeur avec des valeurs par défaut.
 
 ```cpp
@@ -564,7 +564,7 @@ std::cout << a.use_count() << std::endl;                            // 1
 
 Il existe une méthode `use_count` qui permet d'afficher le nombre de référence sur l'objet pointé par le `shared_ptr`, principalement utilisé pour du débogage. La méthode `reset` permet au pointeur de ne plus pointer sur rien (construction par défaut).
 
-Ici, c'est donc les destructeurs des pointeurs appelés automatiquement qui vont permettrent la suppression des références, et donc la libération automatique de l'objet.
+Ici, c'est donc les destructeurs des pointeurs appelés automatiquement qui vont permettre la suppression des références, et donc la libération automatique de l'objet.
 
 Il existe également des conversions entre `shared_ptr`.
 
