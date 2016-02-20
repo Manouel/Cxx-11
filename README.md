@@ -566,17 +566,43 @@ Il existe une méthode `use_count` qui permet d'afficher le nombre de référenc
 
 Ici, c'est donc les destructeurs des pointeurs appelés automatiquement qui vont permettre la suppression des références, et donc la libération automatique de l'objet.
 
-Il existe également des conversions entre `shared_ptr`.
+Il existe également des conversions entre `shared_ptr`, avec les fonctions `static_pointer_cast`, `dynamic_pointer_cast` et `const_pointer_cast`, dont les effets sont les mêmes que leurs équivalents `static_cast`, `dynamic_cast` et `const_cast` lorsqu'ils sont appliqués sur des pointeurs nus.
 
 ```cpp
 class A {/*...*/};
 class B : public A {/*...*/};
 
-B* b1(new B);
-A* a(b1);
-B *b2 = dynamic_cast<B*>(a);
+std::shared_ptr<A> sa(new A);
+std::shared_ptr<A> sab(new B);
 
-std::shared_ptr<B> sb1(new B);
-std::shared_ptr<A> sa(sb1);
-std::shared_ptr<B> sb2 = std::dynamic_pointer_cast<B>(sa);
+std::shared_ptr<B> static_sb = std::static_pointer_cast<B>(sa);		// Ok mais comportement indéfini
+std::shared_ptr<B> dynamic_sb = std::dynamic_pointer_cast<B>(sa);	// nullptr
+
+std::shared_ptr<B> static_sab = std::static_pointer_cast<B>(sab);	// Ok
+std::shared_ptr<B> dynamic_sab = std::dynamic_pointer_cast<B>(sab);	// Ok
 ```
+
+Les `shared_ptr` peuvent cependant présenter des problèmes, notamment lors de la création de cycles.
+
+```cpp
+struct A
+{
+    std::shared_ptr<B> b; 
+};
+
+struct B
+{
+    std::shared_ptr<A> a;
+};
+
+std::shared_ptr<A> a = std::make_shared<A>();
+std::shared_ptr<B> b = std::make_shared<B>();
+
+a->b = b;
+b->a = a;
+
+a.reset();
+b.reset();
+```
+
+Dans cet exmple, les zones mémoires allouées pour les objets `A` et `B` sont toutes les deux pointées par le pointeur créé localement, ainsi que par l'attribut de l'autre classe. Une fois les `reset` appelés, les objets sont devenus inaccessibles depuis le main, mais chaque pointeur dans la classe fait survivre l'autre objet en maintenant son compteur de référence à 1. On obtient donc une fuite mémoire.
