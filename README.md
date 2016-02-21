@@ -23,6 +23,7 @@
 - [Énumérations fortement typées](#enums)
 - [Pointeurs intelligents](#smart_pointers)
   - [shared_ptr](#shared_ptr)
+  - [weak_ptr](#weak_ptr)
 
 ---
 
@@ -530,6 +531,8 @@ Les pointeurs intelligents présentent une solution à ces problèmes. Ils encap
 
 Le premier type de pointeur intelligent est `shared_ptr`, qui permet à plusieurs pointeurs d'accéder à la donnée partagée. Il y a un compteur de référence sur l'objet pointé, incrémenté lorsqu'un nouveau pointeur pointe sur l'objet, et décrémenté lorsqu'un pointeur arrête de pointer sur l'objet (pointeur détruit ou pointant vers un autre objet). Lorsque ce compteur atteint 0, la mémoire de l'objet pointé est libérée.
 
+###### Utilisation
+
 ```cpp
 std::shared_ptr<int> ptr1(new int (42));
 std::shared_ptr<int> ptr2 = std::make_shared<int>(42);	// A utiliser
@@ -582,6 +585,8 @@ std::shared_ptr<B> static_sab = std::static_pointer_cast<B>(sab);	// Ok
 std::shared_ptr<B> dynamic_sab = std::dynamic_pointer_cast<B>(sab);	// Ok
 ```
 
+###### Risques
+
 Les `shared_ptr` peuvent cependant présenter des problèmes, notamment lors de la création de cycles.
 
 ```cpp
@@ -605,4 +610,26 @@ a.reset();
 b.reset();
 ```
 
-Dans cet exmple, les zones mémoires allouées pour les objets `A` et `B` sont toutes les deux pointées par le pointeur créé localement, ainsi que par l'attribut de l'autre classe. Une fois les `reset` appelés, les objets sont devenus inaccessibles depuis le main, mais chaque pointeur dans la classe fait survivre l'autre objet en maintenant son compteur de référence à 1. On obtient donc une fuite mémoire.
+Dans cet exmple, les zones mémoires allouées pour les objets `A` et `B` sont toutes les deux pointées par le pointeur créé localement, ainsi que par l'attribut de l'autre classe. Une fois les `reset` appelés, les objets sont devenus inaccessibles depuis le main, mais chaque pointeur dans la classe fait survivre l'autre objet en maintenant son compteur de référence à 1. On obtient donc une fuite mémoire. Les [`weak_ptr`](#weak_ptr) présentent une solution à ce problème.
+
+###### Fonction de désallocation
+
+Dans certains cas, l'objet alloué doit être libéré via un appel à une fonction et non en appelant `delete` dessus, par exemple si l'on utilise une bibliothèque qui manipule des pointeurs sur nos objets. Dans ce cas, il est possible de passer en deuxième argument du constructeur du `shared_ptr` la fonction de désallocation à utiliser.
+
+```cpp
+// Fonctions à utiliser
+A* createA();
+void freeA(A *t);
+
+std::shared_ptr<A> ptr(createA(), &freeA);
+```
+
+##### weak_ptr <a id="weak_ptr"></a>
+
+Comme expliqué au dessus, les pointeurs `weak_ptr` s'utilisent avec des `shared_ptr` et ont pour but de casser les cycles. Contrairement à un `shared_ptr`, un `weak_ptr` ne modifie pas le comptage de référence de l'objet sur lequel il pointe, et ne possède qu'un simple accès. Cependant contrairement à un pointeur nu, l'utilisateur est averti si l'objet pointé a été désalloué par un `shared_ptr`.
+
+Pour l'utilisation dans les cycles, un membre possèdera un `shared_ptr` et l'autre un `weak_ptr`. Si, comme souvent, il y a une relation d'appartenance entre les deux objets, alors le contenant aura un `shared_ptr` sur le contenu, car il est chargé de sa libération, et l'autre objet n'aura qu'un `weak_ptr` qui n'influera pas sur la durée de vie de l'objet auquel il appartient.
+
+###### Utilisation
+
+Les deux possibilités de création d'un `weak_ptr` sont à partir d'un `shared_ptr` ou bien d'un autre `weak_ptr`. Ici il n'est pas possible d'en créer à partir d'un pointeur nu.
