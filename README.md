@@ -24,6 +24,7 @@
 - [Pointeurs intelligents](#smart_pointers)
   - [shared_ptr](#shared_ptr)
   - [weak_ptr](#weak_ptr)
+  - [unique_ptr](#unique_ptr)
 
 ---
 
@@ -695,4 +696,24 @@ if (!team.expired())
     std::cout << "Valid team" << std::endl;
 else
     std::cout << "No more team" << std::endl;
+```
+
+##### unique_ptr <a id="unique_ptr"></a>
+
+Ce dernier type de pointeur intelligent représente un pointeur simple qui est le seul à pointer sur l'objet alloué. Lorsque le pointeur est détruit, l'objet est détruit. Avec ce type de pointeur la copie est interdite.
+
+Il permet donc d'utiliser le RAII pour libérer automatiquement des objets, en étant plus léger qu'un `shared_ptr` puisqu'il n'a pas de compteur de référence. De plus, il facilite la lecture du code en indiquant qu'il s'agit uniquement d'un pointeur libéré automatiquement.
+
+Ici on utilise un `unqiue_ptr`, pratique aussi pour définir une fonction de désallocation.
+
+```cpp
+void *createProcess();
+void deleteProcess(void *p);
+
+void foo()
+{
+    std::unique_ptr<void> process(createProcess(), &deleteProcess);
+    
+    // process sera automatiquement détruit à la fin de la fonction
+}
 ```
