@@ -18,7 +18,6 @@
 - [Override](#override)
 - [Final](#final)
 - [Bug de chevrons](#chevrons_fix)
-- [Ordre d'appel des constructeurs et destructeurs](#linearization)
 - [Boucle for sur un intervalle](#for)
 - [Énumérations fortement typées](#enums)
 - [Pointeurs intelligents](#smart_pointers)
@@ -395,30 +394,6 @@ std::map<int, std::vector<int> >  // Avant
 std::map<int, std::vector<int>>	  // C++11
 ```
  
----
-
-#### Ordre d'appel des constructeurs et destructeurs <a id="linearization"></a>
-
-L'ordre d'appel des constructeurs et destructeurs ne change pas en C++11. L'affichage suivant présente cet ordre d'appel avec les classes CompteBancaire.
-
-
-Résultat :
-Constructeur CB
-
-Constructeur CompteRemunere
-
-Constructeur CompteDepot
-
-Constructeur CompteDepotRemunere
-
-Destructeur CompteDepotRemunere
-
-Destructeur CompteDepot
-
-Destructeur CompteRemunere
-
-Destructeur CB
-
 ---
 
 #### Boucle for sur un intervalle <a id="for"></a>
