@@ -628,8 +628,71 @@ std::shared_ptr<A> ptr(createA(), &freeA);
 
 Comme expliqué au dessus, les pointeurs `weak_ptr` s'utilisent avec des `shared_ptr` et ont pour but de casser les cycles. Contrairement à un `shared_ptr`, un `weak_ptr` ne modifie pas le comptage de référence de l'objet sur lequel il pointe, et ne possède qu'un simple accès. Cependant contrairement à un pointeur nu, l'utilisateur est averti si l'objet pointé a été désalloué par un `shared_ptr`.
 
-Pour l'utilisation dans les cycles, un membre possèdera un `shared_ptr` et l'autre un `weak_ptr`. Si, comme souvent, il y a une relation d'appartenance entre les deux objets, alors le contenant aura un `shared_ptr` sur le contenu, car il est chargé de sa libération, et l'autre objet n'aura qu'un `weak_ptr` qui n'influera pas sur la durée de vie de l'objet auquel il appartient.
+Pour l'utilisation dans les cycles, un membre possèdera un `shared_ptr` et l'autre un `weak_ptr`. Si, comme souvent, il y a une relation d'appartenance entre les deux objets (ex : région/département), alors le contenant aura un `shared_ptr` sur le contenu, car il est chargé de sa libération, et l'autre objet n'aura qu'un `weak_ptr` qui n'influera pas sur la durée de vie de l'objet auquel il appartient.
 
 ###### Utilisation
 
 Les deux possibilités de création d'un `weak_ptr` sont à partir d'un `shared_ptr` ou bien d'un autre `weak_ptr`. Ici il n'est pas possible d'en créer à partir d'un pointeur nu.
+
+De plus, un `weak_ptr` ne possède pas d'opérateur `->`. Il faut donc créer un `shared_ptr` à partir du `weak_ptr` pour accéder à l'objet pointé, en utilisant le constructeur `shared_ptr(const weak_ptr<T>&)` ou la méthode `lock` (plus explicite).
+
+Dans l'exemple suivant, on peut voir un cas d'utilisation des `weak_ptr` avec des cycles.
+
+```cpp
+class Employee;
+class Team
+{
+    public:
+        std::list<std::shared_ptr<Employee>> employees;
+        
+        std::string getName() const { return "name"; }
+};
+
+class Employee
+{
+    public:
+        std::weak_ptr<Team> team;
+        
+        std::string getTeamName() const
+        {
+            std::shared_ptr<Team> teamPtr = team.lock(); // ou : shared_ptr<Team> teamPtr(team); 
+            
+            if (teamPtr)
+                return teamPtr->getName();
+            else
+                return "unknwon";   // Objet pointé détruit
+        }
+};
+
+int main()
+{
+    std::shared_ptr<Employee> manu = std::make_shared<Employee>();
+    
+    {
+        std::shared_ptr<Team> pepishado = std::make_shared<Team>();
+        
+        pepishado->employees.push_back(manu);
+        manu->team = pepishado;                 // Affectation du weak_ptr à partir d'un shared_ptr
+        
+        std::cout << manu->getTeamName() << std::endl;	// name
+    }
+    
+    // Le pointeur pepishado étant détruit, le compteur est décrémenté.
+    // Ici il valait 1 car le weak_ptr de manu ne l'a pas incrémenté.
+    // L'objet Team pointé est détruit malgré le cycle (au passage il a décrémenté le compteur de manu).
+    
+    std::cout << manu->getTeamName() << std::endl;		// unknwon
+    
+    return 0;
+}
+```
+
+A noter qu'il existe aussi une méthode `bool expired()` permettant de savoir si l'objet pointé par le `weak_ptr` a été détruit ou non.
+
+```cpp
+std::weak_ptr team;
+if (!team.expired())
+    std::cout << "Valid team" << std::endl;
+else
+    std::cout << "No more team" << std::endl;
+```
