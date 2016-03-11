@@ -175,12 +175,12 @@ Parmi les nouveautés apportées, nous avons tout d'abord l'initialisation des a
 class A
 {
 private:
-    int m_IntVal = 5;
-    std::string m_StringVal {"value"};
+    int m_intVal = 5;
+    std::string m_stringVal {"value"};
 
 public:
     A() {}
-    A(int val) : m_IntVal(val) {}
+    A(int val) : m_intVal(val) {}
 };
 ```
 
@@ -258,7 +258,7 @@ Il existe maintenant les collections unordered pour les conteneurs associatifs f
 
 ##### Tuple <a id="tuple"></a>
 
-Ce nouveau conteneur permet de créer une collection de taille fixe avec des types différents. On peut l'utiliser comme le type pair à la différence que celui-ci ne se limite pas à 2 éléments. On peut donc créer un ensemble comportant une liste de types prédéfinis.
+Ce nouveau conteneur permet de créer une collection de taille fixe avec des types différents. On peut l'utiliser comme le type `pair` à la différence que celui-ci ne se limite pas à 2 éléments. On peut donc créer un ensemble comportant une liste de types prédéfinis.
 
 ```cpp
 std::tuple<std::string, int, bool> loutre("loulou", 10, true);
@@ -301,7 +301,7 @@ for (it = begin(v); it != end(v); it++)
 
 On peut maintenant en C++11, hériter des constructeurs d'une super classe à l'aide du mot-clé `using`.
 
-Dans l'exemple présenté, les deux objets feront appel au constructeur de `B`. Dans la classe `D`, le mot using indique que la classe peut utiliser le constructeur de `B` pour les instances de `D` qui sont créées. Cela fonctionne avec les objets alloués automatiquement ou dynamiquement.
+Dans l'exemple présenté, les deux objets feront appel au constructeur de `B`. Dans la classe `D`, le mot `using` indique que la classe peut utiliser le constructeur de `B` pour les instances de `D` qui sont créées. Cela fonctionne avec les objets alloués automatiquement ou dynamiquement.
 
 En revanche, l'héritage de constructeurs ne peut être utilisé que si l'héritage entre les classes n'est pas virtuel.
 
