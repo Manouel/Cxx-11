@@ -436,8 +436,26 @@ std::cout << '\n';
 
 #### Énumérations fortement typées <a id="enums"></a>
 
-Il existe maintenant des énumérations fortement typées, identifiées par `enum class`. Contrairement aux énumérations classiques dont les valeurs étaient implicitement converties en entier (lors d'un affichage par exemple), les énumérations fortement typées nécessitent un cast explicite, et évitent donc les opérations qui n'ont pas de sens.
-Contrairement aux énumérations classiques, l'accès aux valeurs se fait par le nom de l'énumération suivi par l'opérateur de portée `::`.
+Il existe maintenant des énumérations fortement typées, identifiées par `enum class`. Contrairement aux énumérations classiques où les valeurs sont définies dans la portée globale, dans les `enum class` les valeurs sont dans la portée de l'énumération. C'est pourquoi contrairement aux énumérations classiques, l'accès aux valeurs se fait par le nom de l'énumération suivi par l'opérateur de portée `::` (`Enum::Value`).
+Cela permet maintenant d'avoir deux valeurs avec le même identifiant dans la même portée.
+
+```cpp
+/** enum **/
+
+enum E1 { V1 };
+enum E2 { V1 };		// Erreur : redéfinition de V1
+int V1;				// Erreur : redéfinition de V1
+
+/** enum class **/
+
+enum class E1 { V1 };
+enum class E2 { V1 };
+int V1;
+
+E2 e2 = E2::V1;
+```
+
+De plus, avec les énumérations classiques les valeurs étaient implicitement converties en entier (lors d'un affichage par exemple), alors que les énumérations fortement typées nécessitent un cast explicite, et évitent donc les opérations qui n'ont pas de sens.
 
 ```cpp
 enum class Direction { Haut, Droite, Bas, Gauche };
@@ -448,6 +466,18 @@ std::cout << static_cast<int>(dir) << std::endl;
 
 Direction dir2 = dir + 1;       // N'a pas de sens, ne compile plus.
 ```
+
+Enfin, il est possible de spécifier le type des valeurs de l'énumération, et qui par défaut est `int`. Celui-ci peut être renseigné après le nom de l'énumération, comme présenté dans l'exemple suivant. Ici par exemple, on peut choisir de stocker des `char`, car plus légers que des entiers.
+
+```cpp
+enum class A : char { V1, V2 = 'b', V3 };
+
+std::cout << static_cast<int>(A::V1) << std::endl;	// 0
+std::cout << static_cast<char>(A::V2) << std::endl;	// b
+std::cout << static_cast<char>(A::V3) << std::endl;	// c
+```
+
+Concernant l'attribution de valeurs, celle-ci ne change pas, et les valeurs sont bien incrémentées pour les éléments suivants.
 
 ---
 
