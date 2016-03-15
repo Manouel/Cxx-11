@@ -81,22 +81,22 @@ Ce nouveau type et cette nouvelle valeur permettent donc d'éviter les ambiguït
 Le mot-clé `auto`, lorsqu'il est utilisé à la place d'un type de variable, permet au compilateur de déduire ce type à la compilation. Celui-ci sera donc principalement utilisé lors de la création de variables. Pour cela il faut initialiser la variable lors de sa création. C'est à l'aide de la valeur qu'elle reçoit que le compilateur va pouvoir en déduire son type.
 
 ```cpp
-  /* int */
-  auto i = 5;
-  
-  /* int si x de type int, sinon erreur */
-  const auto *v = &x, u = 6;
+/* int */
+auto i = 5;
 
-  /* float */
-  static auto y = 0.0;
-  
-  /* int */
-  auto ii = 3;
-  
-  /* int */
-  auto f() -> int;
-  auto g() -> decltype(ii) { return 0; }
-  auto h() -> decltype(ii);
+/* int si x de type int, sinon erreur */
+const auto *v = &x, u = 6;
+
+/* float */
+static auto y = 0.0;
+
+/* int */
+auto ii = 3;
+
+/* int */
+auto f() -> int;
+auto g() -> decltype(ii) { return 0; }
+auto h() -> decltype(ii);
 ```
 
 Dans l'exemple, la variable `i` sera de type entier, puisqu'elle reçoit un littéral entier valant 5.
@@ -114,17 +114,17 @@ Pour la fonction `g`, il sera du type de la variable `ii`, comme le `decltype` l
 Cette notation fonctionne aussi pour les déclarations de fonction. De même `h` retournera un entier. Il faut bien sur que cette signature corresponde lors de la définition de la fonction `h`.
 
 ```cpp
-  auto h() -> decltype(1)   		int h() { return 1; }
-  auto h() -> decltype(1) 			int h() -> decltype(1) { return 1; }
-  
-  
-  string str = "str";
-  auto f(int i) -> decltype(str) {if (i%2==0) return "pair"; else return "";}
-  
-  auto k = 2; k = 1.2;
-  auto l = 4.2; l = 3;
-  auto x = 5, *y = &x;
-  auto a = 5, b = "cinq";
+auto h() -> decltype(1)   		int h() { return 1; }
+auto h() -> decltype(1) 			int h() -> decltype(1) { return 1; }
+
+
+string str = "str";
+auto f(int i) -> decltype(str) {if (i%2==0) return "pair"; else return "";}
+
+auto k = 2; k = 1.2;
+auto l = 4.2; l = 3;
+auto x = 5, *y = &x;
+auto a = 5, b = "cinq";
 ```
 
 Pour la déclaration de la variable `j`, il faut retirer le type `auto` ou bien `int`. En effet, le compilateur va remplacer le mot `auto` par déduction du type. Il ne faut donc pas indiquer un type supplémentaire.
@@ -143,23 +143,39 @@ La ligne suivante compile également, `auto` sera changé en `int`. La variable 
 La dernière ligne ne compile pas, `a` reçoit un littéral entier, et `b` une chaine de caractères.
 Il faut déclarer ces variables sur 2 lignes distinctes.
 
+Le mot-clé `auto` ne conserve pas les modificateurs de type (`const`, `unsigned`, `short`, `long`...), contrairement à `decltype(auto)` (C++ 14).
+
+```cpp
+const int i = 2;
+auto j = i;         // j est de type int
+```
+
 ---
 
 #### decltype <a id="decltype"></a>
 
-Le mot-clé `decltype` permet de déterminer le type d'une expression.
-Il peut donc être utilisé pour créer une variable. Mais il eut également désigner le type de variable déclarée avec `auto`, comme dans l'exemple suivant.
+Tout comme `auto`, le mot-clé `decltype` permet de déterminer un type, à la différence qu'au lieu d'utiliser l'expression affectée, il va utiliser l'expression qui lui est fournie.
 
-```cpp
-  int i;
-  auto j = 2;
-  
-  decltype(i) v;
-  decltype(j) v2;
+```
+decltype(EXPRESSION) IDENTIFIANT = VALEUR;
 ```
 
-Ici, on considère 2 variables `i` et `j`, de type `int` (`j` étant déclaré avec `auto`).
-Le `decltype` va donc permettre de créer des variables du même type qu'une varialble déclarée avec un type comme `i`, et avec `auto` comme `j`. `v` et `v2` seront donc également de type `int`.
+De plus, contrairement à `auto`, `decltype` conserve les modificateurs de type comme `const`. 
+
+```cpp
+const int i = 1;        // const int
+auto j = 2;             // int
+
+decltype(i) x = 3;      // const int
+decltype(j) y = 4;      // int
+
+i = 11;                 // erreur
+j = 12;
+x = 13;                 // erreur
+y = 14;
+```
+
+Dans cet exemple, la variable `j` sera de type `int`, car `auto` de conserve pas le `const`. En revanche, `x` sera bien de type `const int`, car déclaré avec `decltype`.
 
 Comme vu précédemment, `decltype` va également pouvoir permettre de renseigner le type de retour d'une fonction déclaré comme `auto`.
 
