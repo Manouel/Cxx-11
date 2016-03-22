@@ -274,10 +274,27 @@ Il existe maintenant les collections unordered pour les conteneurs associatifs f
 
 ##### Tuple <a id="tuple"></a>
 
-Ce nouveau conteneur permet de créer une collection de taille fixe avec des types différents. On peut l'utiliser comme le type `pair` à la différence que celui-ci ne se limite pas à 2 éléments. On peut donc créer un ensemble comportant une liste de types prédéfinis.
+Ce nouveau conteneur permet de créer une collection de taille fixe avec des types différents. On peut l'utiliser comme le type `pair` à la différence que celui-ci ne se limite pas à 2 éléments. On peut donc créer un ensemble comportant une liste de types prédéfinis. Il existe également une fonction `make_tuple` prenant en paramètre les valeurs du tuple.
 
 ```cpp
 std::tuple<std::string, int, bool> loutre("loulou", 10, true);
+auto t = std::make_tuple(1, 1.0, 'a', "hello"s);
+```
+
+Ici il n'existe pas de membres `first` ou `second` comme sur les paires, mais une fonction template `get` prenant en paramètre l'indice de la valeur. Il y a aussi une fonction `tuple_size` prenant en paramètre (template) le type du tuple et permettant d'accéder à la taille par le membre `value`. 
+
+```cpp
+std::cout << "Nom : " << std::get<0>(loutre) << std::endl;
+std::cout << "Nombre de propriétés : " << std::tuple_size<decltype(loutre)>::value << std::endl;
+```
+
+A noter qu'il existe maintenant une fonction `tie` permettant de récupérer le résultat d'un tuple ou d'une paire dans des variables existantes, avec la possibilité d'utiliser `std::ignore` pour ignorer des valeurs.
+
+```cpp
+std::string name;
+int age;
+std::tie(name, age, std::ignore) = loutre;
+std::tie(name, age, std::ignore) = std::make_tuple("loulou", 10, true);
 ```
 
 ##### Array <a id="array"></a>
