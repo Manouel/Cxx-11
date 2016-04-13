@@ -500,7 +500,7 @@ std::cout << static_cast<int>(dir) << std::endl;
 Direction dir2 = dir + 1;       // N'a pas de sens, ne compile plus.
 ```
 
-Enfin, il est possible de spécifier le type des valeurs de l'énumération, et qui par défaut est `int`. Celui-ci peut être renseigné après le nom de l'énumération, comme présenté dans l'exemple suivant. Ici par exemple, on peut choisir de stocker des `char`, car plus légers que des entiers.
+Il est aussi possible de spécifier le type des valeurs de l'énumération, et qui par défaut est `int`. Celui-ci peut être renseigné après le nom de l'énumération, comme présenté dans l'exemple suivant. Ici par exemple, on peut choisir de stocker des `char`, car plus légers que des entiers.
 
 ```cpp
 enum class A : char { V1, V2 = 'b', V3 };
@@ -511,6 +511,14 @@ std::cout << static_cast<char>(A::V3) << std::endl;	// c
 ```
 
 Concernant l'attribution de valeurs, celle-ci ne change pas, et les valeurs sont bien incrémentées pour les éléments suivants.
+
+Enfin, tout comme les classes, les énumérations fortement typées permettent les déclarations anticipées.
+
+```cpp
+enum class E;
+void foo(E e);
+enum class E { V1, V2, V3 };
+```
 
 ---
 
