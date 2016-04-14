@@ -13,6 +13,7 @@
   - [Unordered associative](#unordered)
   - [Tuple](#tuple)
   - [Array](#array)
+  - [Forward list](#forward_list)
 - [Fonctions begin et end](#begin_end)
 - [Héritage de constructeurs](#constructors)
 - [Override](#override)
@@ -270,7 +271,15 @@ On y indique les  variables capturées, c'est à dire les variables définies en
 
 ##### Unordered associative <a id="unordered"></a>
 
-Il existe maintenant les collections unordered pour les conteneurs associatifs fonctionnant sur un principe clé/valeur. Cela correspond donc aux classes  map, multimap, set et multiset. Ces nouvelles collections permettent de définir notre propose fonction de hachage utilisée pour stocker les éléments. Cela permet donc de définir notre propre stockage et notre propre complexité lors de l'utilisation du conteneur.
+Il existe maintenant les collections unordered pour les ensembles et conteneurs associatifs fonctionnant sur un principe clé/valeur. Cela correspond donc aux classes  `map`, `multimap`, `set` et `multiset`. Ces nouvelles collections permettent d'éviter un tri inutile des éléments ou de définir notre propose fonction de hachage utilisée pour stocker les éléments. Cela permet donc de définir notre propre stockage et notre propre complexité lors de l'utilisation du conteneur.
+
+```cpp
+std::unordered_set<std::string> uset;
+std::unordered_multiset<int> umset;
+
+std::unordered_map<int, std::string> umap;
+std::unordered_multimap<int, std::string> ummap;
+```
 
 ##### Tuple <a id="tuple"></a>
 
@@ -310,6 +319,14 @@ for (it = tab.begin(); it != tab.end(); ++it)
     std::cout << *it << " ";
 }
 std::cout << std::endl;
+```
+
+##### Forward list <a id="forward_list"></a>
+
+Il est maintenant possible avec `forward_list` de créer des listes simplements chaînées (contrairement aux `list` qui sont doublement chaînées). Chaque élément ne possédant ici qu'un pointeur vers l'élément suivant, il n'est pas possible d'effectuer un parcours en sens inverse ou de revenir en arrière avec les itérateurs.
+
+```cpp
+std::forward_list<int> l { 1, 2, 3 };
 ```
 
 ---
