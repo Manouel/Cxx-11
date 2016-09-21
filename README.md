@@ -30,7 +30,6 @@
 
 #### nullptr <a id="nullptr"></a>
 
-
 ```cpp
 bool pair_int(int i)
 {
@@ -176,7 +175,9 @@ x = 13;                 // erreur
 y = 14;
 ```
 
-Dans cet exemple, la variable `j` sera de type `int`, car `auto` de conserve pas le `const`. En revanche, `x` sera bien de type `const int`, car déclaré avec `decltype`.
+Dans cet exemple, la variable `j` sera de type `int`, car `auto` ne conserve pas le `const`. En revanche, `x` sera bien de type `const int`, car déclaré avec `decltype`.
+
+Mis à part cela, le principal intérêt de `decltype` par rapport à `auto` est lorsque l'on souhaite utiliser le type d'une variable déclarée `auto` (car seul le compilateur connait son type), ou bien avec des templates.
 
 Comme vu précédemment, `decltype` va également pouvoir permettre de renseigner le type de retour d'une fonction déclaré comme `auto`.
 
