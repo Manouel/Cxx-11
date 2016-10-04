@@ -30,49 +30,38 @@
 
 #### nullptr <a id="nullptr"></a>
 
+C++11 introduit une nouvelle valeur `nullptr`, spécialement prévue pour les pointeurs nuls. Cette valeur est de type `std::nullptr_t`. En effet, l'ancienne valeur `NULL` n'étant qu'un alias sur la valeur 0, celle-ci pouvait entrainer des confusions pour le compilateur, comme le montre l'exemple suivant.
+
 ```cpp
-bool pair_int(int i)
+bool is_even(int i)
 {
-  cout << "test pair/impair ";
-  return (i%2 == 0);
+    return (i % 2 == 0);
 }
 
-bool pair_int(int *i)
+bool is_even(int *i)
 {
-  if (!i)
-  {
-    cout << "pas d'entier à traiter ";
-    return true;
-  }
-  else
-    return *i % 2 == 0;
+    if (i)
+        return (*i % 2 == 0);
+    
+    return false;
 }
 
 int main()
 {
-  int i = 2;
-  cout << pair_int(i) << endl;
-  
-  int *pi = new int;
-  *pi = 3;
-  
-  cout << pair_int(*pi) << endl;
-  cout << pair_int(NULL) << endl;
-  cout << pair_int(nullptr) << endl;
-
-  return 0;
+    int i = 2;
+    int *pi = new int(3);
+    
+    std::cout << std::boolalpha;
+    std::cout << is_even(i) << std::endl;           // is_even(int)   OK
+    std::cout << is_even(*pi) << std::endl;         // is_even(int*)  OK
+    std::cout << is_even(NULL) << std::endl;        // is_even(int)   Non souhaité
+    std::cout << is_even(nullptr) << std::endl;     // is_even(int*)  OK
 }
 ```
 
-Dans l'exemple, un fichier contient une fonction `pair_int` qui retourne vrai si l'entier qu'elle reçoit est pair. Il y a 2 versions, la première prenant en paramètre l'entier lui-même, la seconde un pointeur sur cet entier.
+Ici, les deux premiers appels à la fonction `is_even` appellent chacun leur version respective. Lorsque l'on envoie `NULL` à la fonction, c'est la version prenant en paramètre un entier qui est appelée puisque celle-ci vaut 0. Or ici, elle peut représenter un pointeur, créant ainsi une ambiguïté. L'utilisation de la valeur `nullptr` entraine ici le bon appel de fonction.
 
-L.25, c'est la fonction l.5 qui est appelée car on lui envoie la valeur d'un entier `i`. De même lors du 2e appel l.30 car on envoie le contenu pointé par `pi`.
-
-Lors de l'appel l.31, on envoie `NULL`, généralement utilisé pour affecter un pointeur. Seulement ici, c'est un entier qui est reconnu, puisque `NULL` correspond à la valeur 0.
-
-Dans le cas où l'on souhaitait indiquer la valeur d'un pointeur, ça n'est pas la fonction souhaitée qui est appelée, mais la fonction l.5. En revanche, lorsque l'on utilise la valeur nullptr du C++11, de type `std::nullptr_t`, spécialement prévue pour les pointeurs, le programme comprendra bien pointeur nul et la fonction prenant un pointeur en entier sera appelée.
-
-Ce nouveau type et cette nouvelle valeur permettent donc d'éviter les ambiguïtés qu'il pouvait y avoir entre type entier et pointeur, comme dans cet exemple.
+Ce nouveau type doit donc être utilisé pour toute affectation de pointeur.
 
 ---
 
@@ -81,74 +70,29 @@ Ce nouveau type et cette nouvelle valeur permettent donc d'éviter les ambiguït
 Le mot-clé `auto`, lorsqu'il est utilisé à la place d'un type de variable, permet au compilateur de déduire ce type à la compilation. Celui-ci sera donc principalement utilisé lors de la création de variables. Pour cela il faut initialiser la variable lors de sa création. C'est à l'aide de la valeur qu'elle reçoit que le compilateur va pouvoir en déduire son type.
 
 ```cpp
-/* int */
-auto i = 5;
+auto i = 5;             // int
+const auto *j = &i;     // const int*
+const auto k = 2;       // const int
+auto l = k;             // int
 
-/* int si x de type int, sinon erreur */
-const auto *v = &x, u = 6;
+static auto y = 0.0;    // double
 
-/* float */
-static auto y = 0.0;
+auto n = 1, s = "str";  // Erreur !!
+```
 
-/* int */
-auto ii = 3;
+Ici l'ensemble des types sont déduits des valeurs reçues. Par exemple, `i` sera de type entier puisque 5 lui est affecté, et `j` pointant sur ce dernier, il sera un pointeur sur entier.
+La dernière ligne ne compile pas, puisque des deux variables `n` et `s` sont déduits deux types 
+A noter que comme le montre la variable `l`, le mot-clé `auto` ne conserve pas les qualificateurs de type comme `const`, `&` ou `&&`, contrairement à [`decltype(auto)`](https://github.com/Manouel/Cxx-14#decltype_auto) (C++ 14).
 
-/* int */
+Il est également possible d'utiliser le mot-clé `auto` pour indiquer le type de retour d'une fonction. Pour cela, il faut préciser le type de retour avec la syntaxe `-> type` en indiquant directement le type, ou en utilisant la notation `decltype`, afin d'indiquer au compilateur le type qu'il doit déduire de `auto`.
+
+```cpp
 auto f() -> int;
-auto g() -> decltype(ii) { return 0; }
-auto h() -> decltype(ii);
+auto g() -> decltype(i) { return 0; }
+auto h() -> decltype(f());
 ```
 
-Dans l'exemple, la variable `i` sera de type entier, puisqu'elle reçoit un littéral entier valant 5.
-
-Concernant la 2e ligne, celle-ci compilera uniquement si la variable `x` est de type `int`. En effet, de même que lorsque l'on indique un type normal, l'ensemble des variables déclarées sur une même ligne doivent être de même type.
-Etant donné que la variable `u` reçoit, un littéral entier 6, le compilateur ne pourra déduire le type représenté par `auto` uniquement si le pointeur `v` est de même type, c'est à dire si `x` est un entier.
-A noter que le mot-clé `auto` peut être utilisé avec d'autres mots-clé comme `const`.
-
-La variable `y` sera de type double, car elle est initialisée avec un littéral flottant.
-
-Il est également possible d'utiliser le mot-clé `auto` pour indiquer le type de retour d'une fonction. Pour cela, il faut préciser le type de retour avec la syntaxe `-> type` en indiquant directement le type, ou en utilisant la notation `decltype`, afin d'indiquer au compilateur quel type il doit déduire de `auto`.
-
-Dans l'exemple précédent, le type de retour de la fonction `f` sera de type `int`.
-Pour la fonction `g`, il sera du type de la variable `ii`, comme le `decltype` l'indique. Ici par exemple, `g` retournera un entier.
-Cette notation fonctionne aussi pour les déclarations de fonction. De même `h` retournera un entier. Il faut bien sur que cette signature corresponde lors de la définition de la fonction `h`.
-
-```cpp
-auto h() -> decltype(1)   		int h() { return 1; }
-auto h() -> decltype(1) 			int h() -> decltype(1) { return 1; }
-
-
-string str = "str";
-auto f(int i) -> decltype(str) {if (i%2==0) return "pair"; else return "";}
-
-auto k = 2; k = 1.2;
-auto l = 4.2; l = 3;
-auto x = 5, *y = &x;
-auto a = 5, b = "cinq";
-```
-
-Pour la déclaration de la variable `j`, il faut retirer le type `auto` ou bien `int`. En effet, le compilateur va remplacer le mot `auto` par déduction du type. Il ne faut donc pas indiquer un type supplémentaire.
-
-Concernant la première ligne avec la fonction `h`, il faut rajouter un `decltype` sur la signature qui comprend le mot `auto`. Sinon le compilateur ne peut savoir de quel type il s'agit. Comme la fonction retourne 1, on met une expression entière dans le `decltype`.
-Pour la 2e ligne, il faut ajouter le `decltype` à la déclaration et à la définition pusique chacune d'elle comprend le mot-clé `auto`.
-De manière générale, la notation `decltype` doit être utilisée à chaque fois que `auto` est indiqué (signature ou définition de fonction).
-
-Pour la fonction `f`, auto devra correspondre à un string puisque `f` retourne une chaine de caractères dans le `if`. Il faut donc déclarer une varialble de type `string` et ajouter un `decltype` pour indiquer au compilateur que le type de retour sera `string`. De plus il faut ajouter une valeur de retour au `else`.
-
-Pour les variables `k` et `l`, il n'y aura pasde soucis de compilation. `k` sera de type `int`, car affecté avec la valeur 2. Lorsqu'on lui affecte un nombre flotant, la valeur sera castée en `int`, et donc tronquée, `k` vaudra 1.
-`l` sera un `double`, car initialisé avec 4.2. Lors de l'affectation, 3 sera casté en double, `l` vaudra 3.0.
-
-La ligne suivante compile également, `auto` sera changé en `int`. La variable `y` sera un pointeur sur `int`, et reçoit l'adresse de `x`, également de type `int`.
-
-La dernière ligne ne compile pas, `a` reçoit un littéral entier, et `b` une chaine de caractères.
-Il faut déclarer ces variables sur 2 lignes distinctes.
-
-Le mot-clé `auto` ne conserve pas les modificateurs de type (`const`, `unsigned`, `short`, `long`...), contrairement à `decltype(auto)` (C++ 14).
-
-```cpp
-const int i = 2;
-auto j = i;         // j est de type int
-```
+Ici, les retours des trois fonctions seront de type `int`.
 
 ---
 
