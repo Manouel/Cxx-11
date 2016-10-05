@@ -26,6 +26,7 @@
   - [weak_ptr](#weak_ptr)
   - [unique_ptr](#unique_ptr)
 - [Templates variadiques](#variadic_templates)
+- [constexpr](#constexpr)
 
 ---
 
@@ -815,3 +816,69 @@ std::vector<std::string> to_string(const Args&... args)
 ```
 
 Dans cette fonction, chaque élément de `args` est envoyé à la première fonction `to_string` et le résultat est ajouté à la liste pour construire le vecteur résultant.
+
+---
+
+#### constexpr <a id="constexpr"></a>
+
+Un nouveau mot-clé `constexpr` permet en C++11 de déclarer des expressions constantes de compilation. Il peut être utilisé sur des variables ou des fonctions, mais seulement avec des types littéraux. A la différence du mot-clé `const` qui permet simplement d'assurer qu'une variable ne sera pas modifiée, ici la valeur sera calculée à la compilation.
+
+Cette syntaxe permet d'une part de remplacer la syntaxe `define` qui est dépréciée, car ne permet pas de vérification de type, et ne respecte pas les règles de portée. Une variable `constexpr` doit obligatoirement être initialisée.
+
+```cpp
+#define buffer_size 	512
+
+// C++11
+constexpr int buffer_size = 512;
+```
+
+`constexpr` peut aussi être utilisé sur des fonctions qui seront exécutées à la compilation. Une fonction `constexpr` ne peut pas être virtuelle, et son type de retour et le type de ses paramètres doivent être des types littéraux. De plus, celle-ci ne peut pas contenir de déclarations de variable, de conditions ou de boucles.
+
+```cpp
+constexpr int facto(int n)
+{
+	return (n <= 1 ? 1 : n * facto(n - 1));
+}
+
+int sum(int a, int b)
+{
+    return a + b;
+}
+
+int i = 3;
+constexpr int j = 4;
+constexpr int k;                // Erreur : non initialisé
+constexpr int l = i + 1;        // Erreur : i non constant
+
+constexpr int m = facto(4);     // 24
+constexpr int n = facto(i);     // Erreur : i non constant
+constexpr int o = facto(j);     // 24
+constexpr int p = sum(2, 3);    // Erreur : sum non constexpr
+```
+
+Ici la fonction `facto` sera évaluée et utilisée comme une constante de compilation lors de ses différents appels.
+
+Ce type de fonction permet également leur utilisation à des endroits où le compilateur requiert des valeurs constantes, comme les `switch`, les paramètres templates ou les assertions.
+
+```cpp
+constexpr int n = 2;
+
+constexpr int sum(int a, int b)
+{
+    return a + b;
+}
+
+int main()
+{
+	static_assert(n == sum(1, 1), "");    // OK car n et sum constexpr
+
+	int i = 3;
+	switch (i)
+	{
+		case 0: break;
+		case sum(1, 2): break;     // OK car sum constexpr
+ 	}
+}
+```
+
+Les constructeurs peuvent également être définis `constexpr` si chacun de leurs paramètres est de type littéral, si la classe associée n'a pas de super-classe virtuelle et si le constructeur ne contient pas de bloc try/catch. 
