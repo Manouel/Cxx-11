@@ -25,6 +25,7 @@
   - [shared_ptr](#shared_ptr)
   - [weak_ptr](#weak_ptr)
   - [unique_ptr](#unique_ptr)
+- [Templates variadiques](#variadic_templates)
 
 ---
 
@@ -725,3 +726,92 @@ void foo()
     // process sera automatiquement détruit à la fin de la fonction
 }
 ```
+
+---
+
+#### Templates variadiques <a id="variadic_templates"></a>
+
+Il existe maintenant une nouvelle notation permettant de créer des fonctions ou classes à nombre variables de paramètres. Pour cela, il suffit d'utiliser la syntaxe `...` dans les templates, comme le montre l'exemple qui suit.
+
+```cpp
+template<typename... Args>
+void foo(Args... args)
+{
+    // ...
+}
+```
+
+Ici il est possible d'appeler la fonction avec autant de paramètres que l'on veut, avec les types que l'on veut.
+Les templates variadiques sont le plus souvent utilisés de façon récursive, comme le montre l'exemple qui suit.
+
+```cpp
+template<typename T>
+T adder(T v)
+{
+	return v;
+}
+
+template<typename T, typename... Args>
+T adder(T first, Args... args)
+{
+	return first + adder(args...);
+}
+
+
+std::cout << adder(5, 3, 7) << std::endl;                   // 15
+
+std::string s1 = "h", s2 = "el", s3 = "lo";
+std::cout << adder(s1, s2, s3) << std::endl;                // "hello"
+```
+
+La condition d'arrêt est isolée dans une fonction dédiée, qui sera appelée lorsqu'il n'y aura qu'un argument à la fonction `adder`. Sinon, le premier élément est additionné au reste, noté `args...`, qui est passé récursivement à la fonction `adder`.
+
+Dans certains cas, il est également possible d'utiliser chaque paramètre un par un, sans récursion.
+Ce deuxième exemple présente une fonction convertissant en chaine de caractères chaque paramètre. Tout d'abord une version récursive de cette fonction.
+
+```cpp
+template<typename T>
+std::string to_string_impl(const T& t)
+{
+	std::stringstream ss;
+	ss << t;
+	return ss.str();
+}
+
+// Appelé quand args est vide
+std::vector<std::string> to_string()
+{
+	return {};
+}
+
+template<typename T, typename... Args>
+std::vector<std::string> to_string(const T& t, const Args&... args)
+{
+	std::vector<std::string> s;
+	s.push_back(to_string_impl(t));
+
+	const auto remainder = to_string(args...);				// Récursion
+	s.insert(s.end(), remainder.begin(), remainder.end());
+	return s;
+}
+```
+
+Ici, il est donc possible d'écrire cette fonction sans récursion, en utilisant l'expansion `...` sur `args` dans la liste d'initialisation, après l'appel de la fonction.
+
+```cpp
+template<typename T>
+std::string to_string(const T& t)
+{
+	std::stringstream ss;
+	ss << t;
+	return ss.str();
+}
+
+template<typename... Args>
+std::vector<std::string> to_string(const Args&... args)
+{
+	return {to_string(args)...};
+}
+```
+
+Dans cette fonction, chaque élément de `args` est envoyé à la première fonction `to_string` et le résultat est ajouté à la liste pour construire le vecteur résultant.
