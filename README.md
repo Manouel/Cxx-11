@@ -55,7 +55,7 @@ int main()
     
     std::cout << std::boolalpha;
     std::cout << is_even(i) << std::endl;           // is_even(int)   OK
-    std::cout << is_even(*pi) << std::endl;         // is_even(int*)  OK
+    std::cout << is_even(pi) << std::endl;          // is_even(int*)  OK
     std::cout << is_even(NULL) << std::endl;        // is_even(int)   Non souhaité
     std::cout << is_even(nullptr) << std::endl;     // is_even(int*)  OK
 }
